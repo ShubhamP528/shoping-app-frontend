@@ -5,7 +5,7 @@ import { logout } from "../features/auth";
 import { FaShoppingCart } from "react-icons/fa";
 import { fetchCartDetails } from "../features/cart";
 
-function Navbar() {
+function NavBar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
@@ -232,4 +232,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default NavBar;
