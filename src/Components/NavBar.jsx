@@ -43,8 +43,8 @@ function NavBar() {
                 className="flex items-center py-5 px-2 text-gray-700 hover:text-gray-900"
               >
                 <img
-                  height={50}
-                  width={50}
+                  height={40}
+                  width={40}
                   className="rounded-full"
                   alt="logo"
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeTgqVozZ2-D6mepTDaoQw2LfVc222sRZ0dQ&s"

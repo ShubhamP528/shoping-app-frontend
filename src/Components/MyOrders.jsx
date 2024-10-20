@@ -3,6 +3,7 @@ import OrderCard from "./OrderCard";
 import { NODE_API_ENDPOINT } from "../utils/utils";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom"; // Assuming you're using React Router for navigation
 
 import React from "react";
 
@@ -25,7 +26,6 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true); // New loading state
   const currentUser = useSelector((state) => state.auth?.user);
-  console.log(currentUser);
 
   useEffect(() => {
     const getOrder = async () => {
@@ -66,6 +66,19 @@ const Orders = () => {
             <SkeletonLoader />
             <SkeletonLoader />
           </>
+        ) : orders.length === 0 ? (
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-4">No orders found</h2>
+            <p className="mb-6">
+              You haven't placed any orders yet. Start shopping now!
+            </p>
+            <Link
+              to="/shop"
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+            >
+              Start Shopping
+            </Link>
+          </div>
         ) : (
           orders.map((order) => <OrderCard key={order._id} order={order} />)
         )}

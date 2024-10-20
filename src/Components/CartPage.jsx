@@ -1,6 +1,4 @@
-// Cart.js
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
@@ -14,14 +12,37 @@ import { Link } from "react-router-dom"; // Import Link for navigation
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 
+// Shimmer Loader for Cart Items
+const CartSkeletonLoader = () => {
+  return (
+    <div className="animate-pulse flex space-x-4 p-6 max-w-full w-full mx-auto bg-white rounded-lg shadow-md">
+      <div className="bg-gray-300 rounded-md h-24 w-24"></div>
+      <div className="flex-1 space-y-4 py-1">
+        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-300 rounded"></div>
+          <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function Cart() {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
   const currentUser = useSelector((state) => state.auth?.user);
   const [CheckoutLoading, setCheckoutLoading] = useState(null);
+  const [loading, setLoading] = useState(true); // New loading state for shimmer
+
+  useEffect(() => {
+    // Simulate a loading time for shimmer effect (you can replace this with real fetching logic)
+    setTimeout(() => {
+      setLoading(false); // Remove shimmer after fetching cart items
+    }, 1500);
+  }, []);
 
   const handleQuantityChange = async (item, quantity) => {
-    console.log(quantity);
     dispatch(updateQuantity({ id: item._id, quantity }));
     const addtocart = await fetch(
       `${NODE_API_ENDPOINT}/cart/${item?.product?._id}`,
@@ -78,6 +99,10 @@ function Cart() {
   };
 
   const handleCheckout = async () => {
+    if (!currentUser) {
+      toast.error("Please login to checkout");
+      return;
+    }
     toast.success("Proceeding to checkout...");
     const stripe = await loadStripe(
       "pk_test_51PIsJ3SHp2VgW0nsDmiCFnGWNsBl62z1f6g5iAHRbI7Fy882o43cZVPupGgDJMpx4FIbGhUFATu9f9qP3cJMkTRU00rANbAS0Z"
@@ -111,8 +136,21 @@ function Cart() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-3xl font-semibold mb-6 text-center">Your Cart</h1>
-      {cartItems.length === 0 ? (
-        <p className="text-center text-lg">Your cart is empty.</p>
+      {loading ? (
+        <>
+          {/* Shimmer Effect during loading */}
+          <CartSkeletonLoader />
+          <CartSkeletonLoader />
+        </>
+      ) : cartItems.length === 0 ? (
+        <div className="text-center">
+          <p className="text-lg mb-4">Your cart is empty.</p>
+          <Link to="/shop">
+            <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+              Start Shopping
+            </button>
+          </Link>
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Cart Items Section */}
@@ -215,7 +253,7 @@ function Cart() {
                 } font-semibold px-6 py-2 rounded-full transition duration-300 ease-in-out`}
                 onClick={handleCheckout}
               >
-                Proceed to Pay
+                {CheckoutLoading ? "Processing..." : "Proceed to Pay"}
               </button>
             </div>
           </div>

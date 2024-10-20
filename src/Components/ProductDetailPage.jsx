@@ -182,6 +182,10 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = async () => {
+    if (!currentUser) {
+      toast.error("Please sign in to add products to cart");
+      return;
+    }
     dispatch(addToCart(product));
     toast.success("Product added to cart!");
     const addtocart = await fetch(`${NODE_API_ENDPOINT}/cart/${product._id}`, {
@@ -206,6 +210,10 @@ const ProductDetailPage = () => {
   }, []); // Empty dependency array ensures it only runs on mount
 
   const handleAddToCartAndBuy = async () => {
+    if (!currentUser) {
+      toast.error("Please sign in to add products to cart and buy");
+      return;
+    }
     dispatch(addToCart(product));
     toast.success("Product added to cart!");
     const addtocart = await fetch(`${NODE_API_ENDPOINT}/cart/${product._id}`, {
