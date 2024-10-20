@@ -1,39 +1,25 @@
-import styled from 'styled-components';
-import './App.css';
-import Navbar from './Components/Navbar';
-import ProductList from './Components/ProductList';
-import { useState } from 'react';
+import React, { useEffect } from "react";
+import Navbar from "./Components/NavBar";
+import Footer from "./Components/Footer";
+import { Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { retrieveAuth } from "./features/auth";
 
 function App() {
-
-  const [search,setSearch]=useState("");
-  const [S, setS]=useState("");
-
-  const data=(s)=>{
-    setSearch(s);
-  }
-
-
-
-function Sfun(data){
-  setS(data);
-}
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(retrieveAuth());
+  }, []);
 
   return (
-
-    <MainContainer>
-      <Navbar sort={Sfun} find={data}/>
-      <ProductList send={S} find={search}/>
-
-    </MainContainer>
- 
+    <>
+      <div className="mb-20">
+        <Navbar />
+      </div>
+      <Outlet />
+      <Footer />
+    </>
   );
 }
-
-const MainContainer=styled.div``;
-
-
-
-
 
 export default App;
