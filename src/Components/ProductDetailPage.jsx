@@ -243,12 +243,15 @@ const ProductDetailPage = () => {
     const getProduct = async () => {
       try {
         window.scrollTo(0, 0);
-        const prod = await fetch(`/api/product/${productId}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const prod = await fetch(
+          `${NODE_API_ENDPOINT}/api/product/${productId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         if (!prod.ok) {
           toast.error("Failed to get product");
           throw new Error("Failed to fetch product");
