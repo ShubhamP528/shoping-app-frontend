@@ -2,3 +2,17 @@
   text-align: center;
 }
 
+.loader {
+  border-top-color: #3498db;
+  animation: spin 1s infinite linear;
+  border-radius: 50%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

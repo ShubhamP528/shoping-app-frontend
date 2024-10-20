@@ -33,12 +33,13 @@ function Cart() {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const currentUser = useSelector((state) => state.auth?.user);
   const [CheckoutLoading, setCheckoutLoading] = useState(null);
-  const [loading, setLoading] = useState(true); // New loading state for shimmer
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [address, setAddress] = useState("");
 
   useEffect(() => {
-    // Simulate a loading time for shimmer effect (you can replace this with real fetching logic)
     setTimeout(() => {
-      setLoading(false); // Remove shimmer after fetching cart items
+      setLoading(false);
     }, 1500);
   }, []);
 
@@ -55,7 +56,6 @@ function Cart() {
         },
       }
     );
-
     if (!addtocart.ok) {
       toast.error("Failed to add product to cart");
       dispatch(removeItem(item._id));
@@ -98,7 +98,7 @@ function Cart() {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleProceedToPayment = async () => {
     if (!currentUser) {
       toast.error("Please login to checkout");
       return;
@@ -120,9 +120,7 @@ function Cart() {
     );
 
     setCheckoutLoading(false);
-
     const session = response.data;
-
     const result = stripe.redirectToCheckout({
       sessionId: session.id,
     });
@@ -133,12 +131,19 @@ function Cart() {
     }
   };
 
+  const handleCheckout = async () => {
+    if (!currentUser) {
+      toast.error("Please login to checkout");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-3xl font-semibold mb-6 text-center">Your Cart</h1>
       {loading ? (
         <>
-          {/* Shimmer Effect during loading */}
           <CartSkeletonLoader />
           <CartSkeletonLoader />
         </>
@@ -153,7 +158,6 @@ function Cart() {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Cart Items Section */}
           <div className="lg:col-span-2 space-y-4">
             {cartItems.map((item, index) => (
               <div
@@ -197,12 +201,10 @@ function Cart() {
               </div>
             ))}
           </div>
-          {/* Order Summary Section */}
           <div className="cart-summary bg-white p-6 rounded-lg shadow-md flex flex-col">
             <h2 className="text-2xl font-semibold mb-4 text-center">
               Order Summary
             </h2>
-            {/* Itemized List */}
             <div className="space-y-2 flex-1">
               {cartItems.map((item, index) => (
                 <div key={index} className="flex justify-between text-sm">
@@ -215,9 +217,7 @@ function Cart() {
                 </div>
               ))}
             </div>
-            {/* Divider */}
             <div className="border-t my-4"></div>
-            {/* Total Price */}
             <div className="flex justify-between text-lg font-semibold">
               <span>Total Price:</span>
               <span className="text-blue-600">
@@ -229,7 +229,6 @@ function Cart() {
                 )}
               </span>
             </div>
-            {/* Buttons */}
             <div className="mt-4 space-y-2 flex justify-between flex-wrap gap-2">
               <button
                 onClick={handleClearCart}
@@ -246,16 +245,151 @@ function Cart() {
 
               <button
                 disabled={CheckoutLoading}
-                className={`${
-                  CheckoutLoading
-                    ? "bg-gray-400 cursor-not-allowed "
-                    : "bg-green-500 hover:bg-green-700 text-white "
-                } font-semibold px-6 py-2 rounded-full transition duration-300 ease-in-out`}
                 onClick={handleCheckout}
+                className={`bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200 ${
+                  CheckoutLoading ? "cursor-not-allowed opacity-50" : ""
+                }`}
               >
-                {CheckoutLoading ? "Processing..." : "Proceed to Pay"}
+                {CheckoutLoading ? "Proceeding to checkout..." : "Checkout"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              Enter Shipping Address
+            </h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setIsModalOpen(false);
+                handleProceedToPayment();
+              }}
+            >
+              {/* Full Name */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="name"
+                >
+                  Full Name
+                </label>
+                <input
+                  required
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+
+              {/* Street Address */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="street-address"
+                >
+                  Street Address
+                </label>
+                <input
+                  required
+                  id="street-address"
+                  type="text"
+                  placeholder="123 Main St"
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+
+              {/* City */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="city"
+                >
+                  City
+                </label>
+                <input
+                  required
+                  id="city"
+                  type="text"
+                  placeholder="New York"
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+
+              {/* State & Postal Code */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    htmlFor="state"
+                  >
+                    State
+                  </label>
+                  <input
+                    required
+                    id="state"
+                    type="text"
+                    placeholder="NY"
+                    className="w-full p-2 border rounded-md"
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    htmlFor="postal-code"
+                  >
+                    Postal Code
+                  </label>
+                  <input
+                    required
+                    id="postal-code"
+                    type="text"
+                    placeholder="10001"
+                    className="w-full p-2 border rounded-md"
+                  />
+                </div>
+              </div>
+
+              {/* Country */}
+              <div className="mb-4">
+                <label
+                  className="block text-sm font-medium mb-2"
+                  htmlFor="country"
+                >
+                  Country
+                </label>
+                <input
+                  required
+                  id="country"
+                  type="text"
+                  placeholder="United States"
+                  className="w-full p-2 border rounded-md"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                >
+                  Proceed to Payment
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

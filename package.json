@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "@headlessui/react": "^2.1.10",
     "@reduxjs/toolkit": "^2.2.7",
     "@stripe/stripe-js": "^4.5.0",
     "@testing-library/jest-dom": "^5.17.0",

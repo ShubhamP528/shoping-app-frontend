@@ -58,7 +58,7 @@ const Login = () => {
   };
 
   const handleGoogleSignup = () => {
-    window.open("http://localhost:8000/api/auth/google", "_self"); // Redirect to your Google Auth route
+    window.open(`${NODE_API_ENDPOINT}/auth/google`, "_self"); // Redirect to your Google Auth route
   };
 
   return (
