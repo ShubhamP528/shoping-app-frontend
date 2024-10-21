@@ -37,10 +37,7 @@ function Home() {
     const getUserDataFromBackend = async () => {
       try {
         const queryParams = new URLSearchParams(window.location.search);
-        if (queryParams.get("token") === undefined) {
-          return;
-        }
-        const token = queryParams.get("token"); // If you send token as a query param in redirect
+        const token = queryParams.get("token");
         const email = queryParams.get("email");
         const name = queryParams.get("name");
         const userId = queryParams.get("userId");
@@ -65,6 +62,9 @@ function Home() {
               token,
             })
           );
+
+          // Clear query string from URL
+          window.history.replaceState(null, "", window.location.pathname);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);

@@ -153,7 +153,7 @@ const Login = () => {
             </Link>
           </p>
           <div className="flex justify-center space-x-4 mb-4 mt-6">
-            <button className="bg-blue-600 text-white p-2 rounded-full focus:outline-none">
+            {/* <button className="bg-blue-600 text-white p-2 rounded-full focus:outline-none">
               <FaFacebookF />
             </button>
             <button className="bg-blue-400 text-white p-2 rounded-full focus:outline-none">
@@ -161,7 +161,19 @@ const Login = () => {
             </button>
             <button className="bg-red-500 text-white p-2 rounded-full focus:outline-none">
               <FaGoogle onClick={handleGoogleSignup} />
-            </button>
+            </button> */}
+            <button
+              class="w-full px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150"
+              onClick={handleGoogleSignup}
+            >
+              <img
+                class="w- h-6"
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                loading="lazy"
+                alt="google logo"
+              />
+              <span className="text-center">Log in with Google</span>
+            </button>{" "}
           </div>
         </div>
       </div>

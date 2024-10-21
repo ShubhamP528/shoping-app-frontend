@@ -109,7 +109,7 @@ const SignUp = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden my-16">
         {/* Left side illustration */}
         <div className="md:w-1/2 p-6 flex flex-col justify-center items-center bg-white">
           <img
@@ -329,8 +329,8 @@ const SignUp = () => {
           </form>
 
           {/* Social sign up buttons */}
-          <div className="flex justify-center space-x-4 mb-4">
-            <button className="bg-blue-600 text-white p-2 rounded-full focus:outline-none">
+          <div className="flex justify-center space-x-4 mb-4 w-full">
+            {/* <button className="bg-blue-600 text-white p-2 rounded-full focus:outline-none">
               <FaFacebookF />
             </button>
             <button className="bg-blue-400 text-white p-2 rounded-full focus:outline-none">
@@ -338,6 +338,18 @@ const SignUp = () => {
             </button>
             <button className="bg-red-500 text-white p-2 rounded-full focus:outline-none">
               <FaGoogle onClick={handleGoogleSignup} />
+            </button> */}
+            <button
+              class="w-full px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150"
+              onClick={handleGoogleSignup}
+            >
+              <img
+                class="w- h-6"
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                loading="lazy"
+                alt="google logo"
+              />
+              <span className="text-center">Sign up with Google</span>
             </button>
           </div>
           <p className="text-sm text-gray-600">

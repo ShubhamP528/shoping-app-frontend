@@ -34,7 +34,7 @@ function NavBar() {
   return (
     <nav className="bg-white shadow-lg fixed top-0 w-full z-10">
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           <div className="flex space-x-4">
             {/* Logo */}
             <div>
@@ -68,7 +68,7 @@ function NavBar() {
               </Link>
               {currentUser && (
                 <Link to={`/orders`} className={getLinkClasses(`/orders`)}>
-                  My order
+                  My Orders
                 </Link>
               )}
             </div>
@@ -121,20 +121,37 @@ function NavBar() {
           {/* Mobile button */}
           <div className="md:hidden flex items-center">
             <button onClick={toggleMobileMenu} className="mobile-menu-button">
-              <svg
-                className="w-6 h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              {isMobileMenuOpen ? (
+                <svg
+                  className="w-6 h-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -176,7 +193,7 @@ function NavBar() {
             className={getLinkClasses("/orders")}
             onClick={toggleMobileMenu}
           >
-            My orders
+            My Orders
           </Link>
         )}
 
@@ -220,7 +237,7 @@ function NavBar() {
             </Link>
             <Link
               to="/signup"
-              className="block py-2 px-4 text-sm bg-blue-500 text-white rounded hover:bg-blue-400 transition duration-300"
+              className=" w-fit my-2 mx-1 block py-1 px-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-400 transition duration-300"
               onClick={toggleMobileMenu}
             >
               Sign Up
