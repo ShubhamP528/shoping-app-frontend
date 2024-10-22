@@ -157,7 +157,6 @@ function NavBar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
       <div
         className={`mobile-menu ${
           isMobileMenuOpen ? "block" : "hidden"
@@ -190,7 +189,9 @@ function NavBar() {
         {currentUser && (
           <Link
             to="/orders"
-            className={getLinkClasses("/orders")}
+            className={`${getLinkClasses(
+              "/orders"
+            )} flex items-center py-2 px-4 text-gray-700 hover:text-gray-900`}
             onClick={toggleMobileMenu}
           >
             My Orders
@@ -199,14 +200,13 @@ function NavBar() {
 
         <Link
           to="/cart"
-          className="relative block py-2 px-4 text-gray-700 hover:text-gray-900 mt-6"
+          className="relative block py-2 px-4 text-gray-700 hover:text-gray-900 flex items-center"
           onClick={toggleMobileMenu}
         >
-          Cart
           <FaShoppingCart className="text-xl inline-block" />
-          {/* Cart badge */}
+          <span className="ml-2">Cart</span>
           {cartItemsCount > 0 && (
-            <span className=" absolute top-1/4 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform -translate-y-1/2">
+            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
               {cartItemsCount}
             </span>
           )}
@@ -237,7 +237,7 @@ function NavBar() {
             </Link>
             <Link
               to="/signup"
-              className=" w-fit my-2 mx-1 block py-1 px-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-400 transition duration-300"
+              className="w-fit my-2 mx-1 block py-1 px-2 text-sm bg-blue-500 text-white rounded hover:bg-blue-400 transition duration-300"
               onClick={toggleMobileMenu}
             >
               Sign Up
