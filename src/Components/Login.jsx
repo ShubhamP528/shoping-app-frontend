@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaFacebookF, FaTwitter, FaGoogle, FaLinkedin } from "react-icons/fa";
+import { FaGoogle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
@@ -12,6 +12,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -30,50 +31,44 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Handle form submission logic
-      console.log("Form submitted with values:", { email, password });
-      const resp = await fetch(`${NODE_API_ENDPOINT}/login`, {
-        body: JSON.stringify({ email, password }),
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
+      setIsLoading(true); // Start loading
+      try {
+        const resp = await axios.post(`${NODE_API_ENDPOINT}/login`, {
+          email,
+          password,
+        });
+        dispatch(login(resp.data)); // Store auth data in Redux
+        toast.success("Login successful!");
+        navigate("/");
 
-      if (!resp.ok) {
-        const error = await resp.json();
-        toast.error(error.message);
-        // throw new Error(error.message);
+        // Reset form state
+        setEmail("");
+        setPassword("");
+        setFormErrors({});
+      } catch (error) {
+        // Display error toast
+        toast.error(error.response?.data?.message || "Login failed!");
+      } finally {
+        setIsLoading(false); // Stop loading
       }
-
-      const auth = await resp.json();
-      console.log(auth);
-      dispatch(login(auth));
-      navigate("/");
-      // Reset form state
-      setEmail("");
-      setPassword("");
-      setFormErrors({});
-
-      // Redirect to home page after successful login
     }
   };
 
   const handleGoogleSignup = () => {
-    window.open(`${NODE_API_ENDPOINT}/auth/google`, "_self"); // Redirect to your Google Auth route
+    window.open(`${NODE_API_ENDPOINT}/auth/google`, "_self"); // Redirect to Google Auth route
   };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Left side illustration */}
         <div className="md:w-1/2 p-6 flex flex-col justify-center items-center bg-white">
           <img
-            src="https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg?w=740&t=st=1725251874~exp=1725252474~hmac=e202e5cef4f0640869370902d122ddea7c0e32cb231bfa6e9739e4669ad82970" // Replace with your image URL
+            src="https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg"
             alt="Login Illustration"
             className="max-w-xs"
           />
         </div>
 
-        {/* Right side form */}
         <div className="md:w-1/2 p-8">
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
             Welcome to Sneath!
@@ -142,8 +137,9 @@ const Login = () => {
             <button
               type="submit"
               className="w-full bg-purple-600 text-white p-2 rounded mt-6 hover:bg-purple-700"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </button>
           </form>
           <p className="text-center text-gray-600 mt-4">
@@ -153,17 +149,8 @@ const Login = () => {
             </Link>
           </p>
           <div className="flex justify-center space-x-4 mb-4 mt-6">
-            {/* <button className="bg-blue-600 text-white p-2 rounded-full focus:outline-none">
-              <FaFacebookF />
-            </button>
-            <button className="bg-blue-400 text-white p-2 rounded-full focus:outline-none">
-              <FaTwitter />
-            </button>
-            <button className="bg-red-500 text-white p-2 rounded-full focus:outline-none">
-              <FaGoogle onClick={handleGoogleSignup} />
-            </button> */}
             <button
-              class="w-full px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150"
+              className="w-full px-4 py-2 border flex gap-2 border-slate-200 rounded-lg text-slate-700 hover:shadow transition duration-150 place-content-center"
               onClick={handleGoogleSignup}
             >
               <img
@@ -172,8 +159,9 @@ const Login = () => {
                 loading="lazy"
                 alt="google logo"
               />
-              <span className="text-center">Log in with Google</span>
-            </button>{" "}
+              {/* <FaGoogle className="text-red-500" /> */}
+              <span>Log in with Google</span>
+            </button>
           </div>
         </div>
       </div>

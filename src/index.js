@@ -31,6 +31,7 @@ import ReturnPolicy from "./Components/ReturnPolicy";
 import TermsOfUse from "./Components/TermOfUse";
 import SecurityPolicy from "./Components/SecurityPolicy";
 import PrivacyPolicy from "./Components/Policy";
+import AddProductForm from "./Components/AddProduct";
 
 // Define your router configuration
 const appRouter = createBrowserRouter([
@@ -87,6 +88,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/contact",
         element: <ContactUs />,
+      },
+      {
+        path: "/add-new-product",
+        element: <AddProductForm />,
       },
       {
         path: "/careers",
