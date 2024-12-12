@@ -198,19 +198,22 @@ function NavBar() {
           </Link>
         )}
 
-        <Link
-          to="/cart"
-          className="relative block py-2 px-4 text-gray-700 hover:text-gray-900 flex items-center"
-          onClick={toggleMobileMenu}
-        >
-          <FaShoppingCart className="text-xl inline-block" />
-          <span className="ml-2">Cart</span>
-          {cartItemsCount > 0 && (
-            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-              {cartItemsCount}
-            </span>
-          )}
-        </Link>
+        {currentUser && (
+          <Link
+            to="/cart"
+            className="relative py-2 pt-8 px-4 text-gray-700 hover:text-gray-900 flex items-center"
+            onClick={toggleMobileMenu}
+          >
+            <FaShoppingCart className="text-xl inline-block" />
+            <span className="ml-2">Cart</span>
+            {cartItemsCount > 0 && (
+              <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
+                {cartItemsCount}
+              </span>
+            )}
+          </Link>
+        )}
+
         {currentUser ? (
           <>
             <span className="block py-2 px-4 text-gray-700">

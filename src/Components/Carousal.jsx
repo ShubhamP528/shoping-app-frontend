@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 
 const Carousel = () => {
   const images = [
-    "https://rukminim2.flixcart.com/fk-p-flap/1000/170/image/ec29d9b3b0a537d1.jpg?q=20",
-    "https://rukminim2.flixcart.com/fk-p-flap/1000/170/image/1e31c9d65e3b4592.jpg?q=20",
-    "https://rukminim2.flixcart.com/fk-p-flap/1000/170/image/df5fc1c522d37039.jpg?q=20",
-    "https://rukminim2.flixcart.com/fk-p-flap/1000/170/image/d61ef11b1f46353f.jpeg?q=20",
+    "https://rukminim2.flixcart.com/fk-p-flap/1620/270/image/96394e0900c8983c.jpg?q=20",
+    "https://rukminim2.flixcart.com/fk-p-flap/1620/270/image/fac0652bee3b3e64.jpg?q=20",
+    // "https://rukminim2.flixcart.com/fk-p-flap/1620/270/image/2f9efb9834ed1ae5.jpg?q=20",
+    "https://rukminim2.flixcart.com/fk-p-flap/1620/270/image/8074e7b2f6d2bfea.jpg?q=20",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,18 +25,23 @@ const Carousel = () => {
   // Auto scroll effect
   useEffect(() => {
     const interval = setInterval(() => {
-      nextSlide(); // Automatically moves to the next slide
-    }, 3000); // Change every 3 seconds
+      nextSlide();
+    }, 3000);
 
-    return () => clearInterval(interval); // Cleanup to avoid memory leaks
-  }, [currentIndex]); // Runs whenever currentIndex changes
+    return () => clearInterval(interval);
+  }, [currentIndex]);
 
   return (
-    <div className=" h-44 w-full m-auto pt-8 px-4 relative group ">
-      <div
-        style={{ backgroundImage: `url(${images[currentIndex]})` }}
-        className="w-full h-full bg-center bg-cover duration-500 rounded-md"
-      ></div>
+    <div className="h-44 w-full m-auto pt-2 px-4 relative group">
+      {/* Image Display */}
+      <div className="w-full h-full flex items-center justify-center">
+        <img
+          src={images[currentIndex]}
+          alt={`Slide ${currentIndex + 1}`}
+          className="rounded-md w-full h-full object-fill"
+        />
+      </div>
+
       {/* Left Arrow */}
       <div
         className="absolute top-1/2 left-5 transform -translate-y-1/2 text-2xl rounded-full p-2 bg-black/30 text-white cursor-pointer"
@@ -44,6 +49,7 @@ const Carousel = () => {
       >
         ❮
       </div>
+
       {/* Right Arrow */}
       <div
         className="absolute top-1/2 right-5 transform -translate-y-1/2 text-2xl rounded-full p-2 bg-black/30 text-white cursor-pointer"
@@ -51,8 +57,9 @@ const Carousel = () => {
       >
         ❯
       </div>
+
       {/* Dots */}
-      <div className="flex justify-center py-2">
+      <div className="flex justify-center pt-2">
         {images.map((_, index) => (
           <div
             key={index}

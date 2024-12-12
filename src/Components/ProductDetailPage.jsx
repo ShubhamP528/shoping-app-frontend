@@ -472,7 +472,7 @@ const ProductDetailPage = () => {
             <img
               src={selectedImage}
               alt={product.name}
-              className="w-full h-auto rounded-lg shadow-lg mb-4"
+              className="w-full h-96 rounded-lg shadow-lg mb-4"
             />
             <div className="flex space-x-4 justify-center">
               {product.images.map((image, index) => (
@@ -549,23 +549,6 @@ const ProductDetailPage = () => {
             </button>
           </div>
         </div>
-
-        {/* Comments Section */}
-        {/* <div className="mt-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            User Comments
-          </h2>
-          {comments.map((comment, index) => (
-            <div key={comment._id} className="mb-4 border-b pb-2">
-              <div className="flex items-center">
-                {renderStars(comment?.rating)}
-                <span className="ml-2 font-semibold text-gray-800">
-                  {comment?.user?.name}
-                </span>
-              </div>
-              <p className="text-gray-700">{comment?.comment}</p>
-            </div>
-          ))} */}
 
         {/* Display Existing Reviews */}
         <div className="mt-6">
@@ -674,43 +657,12 @@ const ProductDetailPage = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Suggested Products
         </h2>
-        {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"> */}
-        {/* {suggestedProducts.map((suggestedProduct) => (
-            <div
-              key={suggestedProduct.id}
-              className="bg-white p-4 rounded-lg shadow-lg"
-            >
-              <img
-                src={suggestedProduct.image}
-                alt={suggestedProduct.name}
-                className="w-full h-40 object-cover rounded mb-2"
-              />
-              <h3 className="text-lg font-semibold text-gray-800">
-                {suggestedProduct.name}
-              </h3>
-              <div className="flex items-center mb-2">
-                {renderStars(Math.floor(suggestedProduct.rating))}
-                <span className="ml-2 text-lg text-gray-500">
-                  ({suggestedProduct.reviews} reviews)
-                </span>
-              </div>
-              <div className="text-xl font-bold text-gray-800">
-                {suggestedProduct.price}
-              </div>
-              <button className="bg-blue-600 text-white w-full py-2 rounded mt-2 hover:bg-blue-700">
-                View Product
-              </button>
-            </div>
-          ))} */}
-
         <HorizentalProductCarousel
           products={suggestedProduct}
           loading={loading}
         />
-        {/* </div> */}
       </div>
     </div>
-    // </div>
   );
 };
 

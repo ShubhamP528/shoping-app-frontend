@@ -4,6 +4,7 @@ import Footer from "./Components/Footer";
 import { Outlet } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { retrieveAuth } from "./features/auth";
+import "./App.css";
 
 function App() {
   const dispatch = useDispatch();

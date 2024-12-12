@@ -1,18 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ProductCardShimmer from "./ProductCardShimmer";
 
-const HorizentalProductCarousel = ({ products, loading }) => {
+const HorizontalProductCarousel = ({ products, loading }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
   const scroll = (direction) => {
     const { current } = scrollRef;
+    const scrollAmount = current.offsetWidth; // Dynamic scroll based on container width
     if (direction === "left") {
-      current.scrollBy({ left: -400, behavior: "smooth" }); // Adjust scroll value based on card size
+      current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
     } else {
-      current.scrollBy({ left: 400, behavior: "smooth" });
+      current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
@@ -29,7 +30,7 @@ const HorizentalProductCarousel = ({ products, loading }) => {
 
         {/* Scrollable Container */}
         <div
-          className="flex overflow-x-hidden space-x-4 scrollbar-hide p-6 rounded-md"
+          className="flex overflow-x-scroll space-x-4 p-6 rounded-md hide-scrollbar"
           ref={scrollRef}
         >
           {loading ? (
@@ -42,81 +43,47 @@ const HorizentalProductCarousel = ({ products, loading }) => {
             </>
           ) : (
             <>
-              {products.map((product, index) => (
+              {products.map((product) => (
                 <div
+                  onClick={() => navigate(`/product/${product?._id}`)}
                   key={product._id}
-                  className="bg-white rounded-lg shadow-lg relative hover:scale-105 hover:shadow-xl cursor-pointer transition-all duration-300 group"
+                  className="flex-shrink-0 bg-white rounded-lg shadow-lg hover:shadow-xl cursor-pointer transition-all duration-300 group w-[300px] border border-gray-200"
                 >
-                  <div className="relative ">
+                  {/* Image Section */}
+                  <div className="relative">
                     <img
                       src={product.images[0]}
                       alt={`${product.name}`}
-                      className="min-w-[300px] max-w-[305px] h-[300px] bg-white shadow-lg rounded-lg"
+                      className="w-full h-[250px] object-cover rounded-t-lg"
                     />
-                    {/* <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                  {product.offer}
-                </div> */}
                     {product.isBestSeller && (
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-white text-xs font-semibold px-2 py-1 rounded">
                         Best Seller
                       </div>
                     )}
                   </div>
 
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600">
+                  {/* Content Section */}
+                  <div className="p-4 space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-800 group-hover:text-blue-600 truncate">
                       {product.name}
                     </h3>
-                    <div className="flex items-center mt-2">
-                      <span className="text-yellow-400 text-sm">
-                        {"★".repeat(Math.floor(product.rating))}
+                    <div className="flex items-center text-yellow-400 text-sm">
+                      {"★".repeat(Math.floor(product.rating))}
+                      <span className="text-gray-500 ml-2 text-xs">
+                        ({product.rating.toFixed(1)})
                       </span>
-                      {/* <span className="ml-2 text-sm text-gray-500">
-                    ({product.reviews} reviews)
-                  </span> */}
                     </div>
-                    <div className="mt-2">
-                      <span className="text-xl font-bold text-gray-800">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-lg font-bold text-gray-800">
                         ₹{product.price}
                       </span>
-                      <span className="text-sm text-gray-500 line-through ml-2">
+                      <span className="text-sm text-gray-500 line-through">
                         ₹{product.originalPrice}
                       </span>
                     </div>
-                    {/* 
-                <ul className="mt-3 text-sm text-gray-600">
-                  {product.highlights.map((highlight, index) => (
-                    <li key={index} className="flex items-center">
-                      <span className="mr-2 text-green-600">✔</span>
-                      {highlight}
-                    </li>
-                  ))}
-                </ul> */}
-
-                    {/* View Product Button */}
-                    <button
-                      onClick={() => navigate(`/product/${product?._id}`)}
-                      className="mt-4 w-full block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
-                    >
-                      View Product
-                    </button>
                   </div>
                 </div>
-
-                // <div
-                //   key={index}
-                //   className="min-w-[300px] max-w-[300px] bg-white shadow-lg p-4 rounded-lg"
-                // >
-                //   <img
-                //     src={product.images[0]}
-                //     alt={product.name}
-                //     className="h-40 object-cover w-full"
-                //   />
-                //   <h3 className="mt-2 font-semibold text-sm truncate">
-                //     {product.name}
-                //   </h3>
-                //   <p className="text-sm text-gray-600">{product.description}</p>
-                // </div>
               ))}
             </>
           )}
@@ -134,4 +101,4 @@ const HorizentalProductCarousel = ({ products, loading }) => {
   );
 };
 
-export default HorizentalProductCarousel;
+export default HorizontalProductCarousel;

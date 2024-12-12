@@ -246,7 +246,7 @@ function Cart() {
               <button
                 disabled={CheckoutLoading}
                 onClick={handleCheckout}
-                className={`bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200 ${
+                className={`bg-green-500 w-full text-white py-2 px-4 rounded hover:bg-green-600 transition duration-200 ${
                   CheckoutLoading ? "cursor-not-allowed opacity-50" : ""
                 }`}
               >
