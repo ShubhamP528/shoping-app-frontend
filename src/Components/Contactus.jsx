@@ -35,16 +35,32 @@ const ContactUs = () => {
               <FaEnvelope className="text-indigo-600 w-10 h-10" />
             </div>
             <h4 className="mt-4 text-lg font-medium text-gray-900">Email</h4>
-            <p className="mt-2 text-base text-gray-500">support@shopkro.com</p>
+            <p className="mt-2 text-base text-gray-500">
+              shubham2021prajapati@gmail.com
+            </p>
           </div>
-          {/* Address */}
+          {/* Registered Address */}
           <div className="text-center">
             <div className="bg-indigo-100 p-6 rounded-full inline-block">
               <FaMapMarkerAlt className="text-indigo-600 w-10 h-10" />
             </div>
-            <h4 className="mt-4 text-lg font-medium text-gray-900">Address</h4>
+            <h4 className="mt-4 text-lg font-medium text-gray-900">
+              Registered Address
+            </h4>
             <p className="mt-2 text-base text-gray-500">
-              123 Shopping St, E-Commerce City, gurugram 238689
+              Rudrapur, Udham Singh Nagar, Uttarakhand, PIN: 263153
+            </p>
+          </div>
+          {/* Operational Address */}
+          <div className="text-center md:col-span-3">
+            <div className="bg-indigo-100 p-6 rounded-full inline-block">
+              <FaMapMarkerAlt className="text-indigo-600 w-10 h-10" />
+            </div>
+            <h4 className="mt-4 text-lg font-medium text-gray-900">
+              Operational Address
+            </h4>
+            <p className="mt-2 text-base text-gray-500">
+              Rudrapur, Udham Singh Nagar, Uttarakhand, PIN: 263153
             </p>
           </div>
         </div>
