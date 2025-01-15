@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-white py-8">
+    <footer className="bg-gray-800 text-white py-4">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About Section */}
@@ -118,7 +118,7 @@ function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-700 pt-6 text-sm text-gray-400">
+        <div className="mt-4 border-t border-gray-700 pt-6 text-sm text-gray-400">
           <p>© {new Date().getFullYear()} shopkro. All rights reserved.</p>
           <p className="mt-2">This is a fictional footer for a shopkro.</p>
         </div>

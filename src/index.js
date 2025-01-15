@@ -35,6 +35,7 @@ import AddProductForm from "./Components/AddProduct";
 import { GoogleOAuthProvider } from "@react-oauth/google"; // Import the provider
 import Profile from "./Components/Profile";
 import EditProfile from "./Components/EditProfile";
+import CheckoutPage from "./Components/Checkoutpage";
 
 // Define your router configuration
 const appRouter = createBrowserRouter([
@@ -139,6 +140,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/edit-profile",
         element: <EditProfile />,
+      },
+      {
+        path: "/checkout",
+        element: <CheckoutPage />,
       },
     ],
   },

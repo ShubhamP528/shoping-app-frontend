@@ -13,6 +13,7 @@ const SignUp = () => {
   const [isCustomer, setIsCustomer] = useState(true);
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false); // Loading state
+  const [Gloading, seGtLoading] = useState(false); // Loading state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -99,7 +100,7 @@ const SignUp = () => {
 
     if (response.credential) {
       const token = response.credential;
-      setLoading(true);
+      seGtLoading(true);
 
       // Send the token to the backend for validation
       const resp = await fetch(`${NODE_API_ENDPOINT}/auth/google/callback`, {
@@ -111,11 +112,11 @@ const SignUp = () => {
       });
 
       if (!resp.ok) {
-        setLoading(false);
+        seGtLoading(false);
 
         throw new Error("Invalid credentials");
       }
-      setLoading(false);
+      seGtLoading(false);
       const data = await resp.json();
       dispatch(login(data));
       toast.success("Logged in successfully!");
@@ -254,14 +255,14 @@ const SignUp = () => {
             <span>Sign in with Google</span>
           </button> */}
 
-          {loading ? (
+          {Gloading ? (
             <ColorRing
               visible={true}
               height="30"
               width="30"
               ariaLabel="color-ring-loading"
               wrapperClass="flex justify-center"
-              colors={["#e15b64", "#f47e60", "#f8b26a", "#abbd81", "#849b87"]}
+              colors={["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"]}
             />
           ) : (
             <GoogleLogin

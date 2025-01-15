@@ -8,9 +8,11 @@ import {
 } from "../features/cart";
 import { toast } from "react-toastify";
 import { NODE_API_ENDPOINT } from "../utils/utils";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom"; // Import Link for navigation
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
+import { ColorRing } from "react-loader-spinner";
+import PaymentWarningPage from "./PaymentWarningPage";
 
 // Shimmer Loader for Cart Items
 const CartSkeletonLoader = () => {
@@ -33,9 +35,22 @@ function Cart() {
   const { cartItems, status, error } = useSelector((state) => state.cart);
   const currentUser = useSelector((state) => state.auth?.user);
   const [CheckoutLoading, setCheckoutLoading] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [address, setAddress] = useState("");
+  const [receipt, setReceipt] = useState(`receipt_${Date.now()}`);
+  const [amount, setAmount] = useState(0);
+  const [patiallyDone, setPatiallyDone] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const sum = cartItems.reduce(
+      (total, item) => total + item?.product?.price * item?.quantity,
+      0
+    );
+    setAmount(sum);
+  }, [cartItems]);
 
   useEffect(() => {
     // Lock scroll when modal is open
@@ -46,11 +61,11 @@ function Cart() {
     }
 
     // Update loading state based on cart status
-    if (status === "loading" || status === "failed") {
-      setLoading(true);
-    } else {
-      setLoading(false);
-    }
+    // if (status === "loading" || status === "failed") {
+    //   setLoading(true);
+    // } else {
+    //   setLoading(false);
+    // }
 
     // Cleanup the overflow style on unmount
     return () => {
@@ -151,14 +166,119 @@ function Cart() {
       toast.error("Please login to checkout");
       return;
     }
-    setIsModalOpen(true);
+    // setIsModalOpen(true);
+    navigate("/checkout");
   };
+
+  const loadRazorpay = async () => {
+    setLoading(true);
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onerror = () => {
+      setLoading(false);
+      alert("Razorpay SDK failed to load. Are you online?");
+    };
+    script.onload = async () => {
+      try {
+        const result = await axios.post(
+          `${NODE_API_ENDPOINT}/create-order`,
+          {
+            amount: amount,
+            currency: "INR",
+            receipt: receipt,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${currentUser?.token}`,
+            },
+          }
+        );
+        setIsModalOpen(false);
+
+        console.log(result);
+
+        const { id, currency } = result.data.razorpayOrder;
+        const { _id } = result.data.createdOrder;
+
+        const options = {
+          key: process.env.REACT_APP_RAZORPAY_ID,
+          //   amount: String(amount),
+          currency: currency,
+          name: "CLAW LEGALTECH PRIVATE LIMITED",
+          description: "Transaction",
+          order_id: id,
+          handler: async function (response) {
+            console.log(response);
+            const data = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              _id,
+              amount,
+            };
+
+            console.log(response);
+            setPatiallyDone(true);
+            const result = await axios.post(
+              `${NODE_API_ENDPOINT}/verifyPayment`,
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${currentUser?.token}`,
+                },
+              }
+            );
+            setPatiallyDone(false);
+            alert("Payment done successfully");
+            toast.success("Your order has been placed successfully");
+            setLoading(false);
+            dispatch(clearCart());
+            console.log(result.data);
+            navigate("/orders");
+          },
+          prefill: {
+            name: currentUser?.name,
+            email: currentUser?.email,
+            contact: currentUser?.phoneNumber,
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+
+        console.log(options);
+
+        const paymentObject = new window.Razorpay(options);
+
+        console.log(paymentObject);
+        paymentObject.open();
+      } catch (error) {
+        setLoading(false);
+        alert(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    document.body.appendChild(script);
+  };
+
+  // useEffect(() => {
+  //   if (!loading) {
+  //     setIsModalOpen(false);
+  //   }
+  // }, [loading]);
+
+  if (patiallyDone) {
+    return <PaymentWarningPage />;
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-8">
       <h1 className="text-3xl font-semibold mb-6 text-center">Your Cart</h1>
-      {loading ? (
+      {status === "loading" || status === "failed" ? (
         <>
+          <CartSkeletonLoader />
+          <CartSkeletonLoader />
           <CartSkeletonLoader />
           <CartSkeletonLoader />
         </>
@@ -235,14 +355,7 @@ function Cart() {
             <div className="border-t my-4"></div>
             <div className="flex justify-between text-lg font-semibold">
               <span>Total Price:</span>
-              <span className="text-blue-600">
-                ₹
-                {cartItems.reduce(
-                  (total, item) =>
-                    total + item?.product?.price * item?.quantity,
-                  0
-                )}
-              </span>
+              <span className="text-blue-600">₹{amount}</span>
             </div>
             <div className="mt-4 space-y-2 flex justify-between flex-wrap gap-2">
               <button
@@ -267,221 +380,6 @@ function Cart() {
               >
                 {CheckoutLoading ? "Proceeding to checkout..." : "Checkout"}
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-hidden">
-            <h2 className="text-xl font-semibold mb-4 text-center">
-              Enter Shipping Address
-            </h2>
-            <div className="modal-content overflow-y-auto max-h-[70vh]">
-              {" "}
-              {/* Scrollable content */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setIsModalOpen(false);
-                  handleProceedToPayment();
-                }}
-              >
-                {/* Full Name */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="name"
-                  >
-                    Full Name
-                  </label>
-                  <input
-                    required
-                    id="name"
-                    type="text"
-                    placeholder="John Doe"
-                    className="w-full p-2 text-sm border rounded-md"
-                  />
-                </div>
-
-                {/* Mobile Number */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="mobileNumber"
-                  >
-                    Mobile Number
-                  </label>
-                  <input
-                    required
-                    id="mobileNumber"
-                    type="text"
-                    placeholder="9876543210"
-                    className="w-full p-2 text-sm border rounded-md"
-                    pattern="^[6-9]\d{9}$"
-                    title="Please enter a valid Indian mobile number"
-                  />
-                </div>
-
-                {/* Street Address */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="streetAddress"
-                  >
-                    Street Address
-                  </label>
-                  <input
-                    required
-                    id="streetAddress"
-                    type="text"
-                    placeholder="123 Main St"
-                    className="w-full p-2 text-sm border rounded-md"
-                  />
-                </div>
-
-                {/* Landmark (optional) */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="landmark"
-                  >
-                    Landmark (Optional)
-                  </label>
-                  <input
-                    id="landmark"
-                    type="text"
-                    placeholder="Near Central Park"
-                    className="w-full p-2 text-sm border rounded-md"
-                  />
-                </div>
-
-                {/* Area */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="area"
-                  >
-                    Area
-                  </label>
-                  <input
-                    required
-                    id="area"
-                    type="text"
-                    placeholder="Koramangala"
-                    className="w-full p-2 text-sm border rounded-md"
-                  />
-                </div>
-
-                {/* City */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="city"
-                  >
-                    City
-                  </label>
-                  <input
-                    required
-                    id="city"
-                    type="text"
-                    placeholder="Bangalore"
-                    className="w-full p-2 text-sm border rounded-md"
-                  />
-                </div>
-
-                {/* State & Postal Code */}
-                <div className="grid grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      htmlFor="state"
-                    >
-                      State
-                    </label>
-                    <input
-                      required
-                      id="state"
-                      type="text"
-                      placeholder="Karnataka"
-                      className="w-full p-2 text-sm border rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      htmlFor="postalCode"
-                    >
-                      Postal Code
-                    </label>
-                    <input
-                      required
-                      id="postalCode"
-                      type="text"
-                      placeholder="560001"
-                      className="w-full p-2 text-sm border rounded-md"
-                      pattern="^[1-9][0-9]{5}$"
-                      title="Please enter a valid postal code"
-                    />
-                  </div>
-                </div>
-
-                {/* Country */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="country"
-                  >
-                    Country
-                  </label>
-                  <input
-                    required
-                    id="country"
-                    type="text"
-                    value="India"
-                    readOnly
-                    className="w-full p-2 text-sm border rounded-md bg-gray-100"
-                  />
-                </div>
-
-                {/* Address Type */}
-                <div className="mb-3">
-                  <label
-                    className="block text-sm font-medium mb-1"
-                    htmlFor="addressType"
-                  >
-                    Address Type
-                  </label>
-                  <select
-                    id="addressType"
-                    required
-                    className="w-full p-2 text-sm border rounded-md"
-                  >
-                    <option value="Home">Home</option>
-                    <option value="Office">Office</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex justify-end space-x-2 mt-4">
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="bg-gray-500 text-white py-2 px-4 text-sm rounded hover:bg-gray-600"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-green-500 text-white py-2 px-4 text-sm rounded hover:bg-green-600"
-                  >
-                    Proceed to Payment
-                  </button>
-                </div>
-              </form>
             </div>
           </div>
         </div>

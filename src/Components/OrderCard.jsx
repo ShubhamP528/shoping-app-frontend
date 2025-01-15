@@ -7,27 +7,71 @@ const OrderCard = ({ order }) => {
 
   const { user, items, totalAmount, status, createdAt } = order;
 
+  console.log(order);
+
   const handleDownloadInvoice = () => {
     const doc = new jsPDF();
 
-    // Set default font size
+    // Correct font path for CRA public folder
+    const fontPath = "/fonts/NotoSans-Regular.ttf"; // Correct relative path from 'public' directory
+
+    // Load the font
+    doc.addFileToVFS("NotoSans-Regular.ttf", fontPath); // Add font to virtual file system
+    doc.setFont("NotoSans-Regular"); // Set the font to NotoSans-Regular
+
+    // Set font size and other settings
     doc.setFontSize(12);
 
-    // Add title
-    doc.text(`Invoice for Order: ${order._id}`, 14, 20);
+    // Add company name and invoice title
+    doc.setFontSize(16);
+    doc.text("Smart Solution Pvt. Ltd.", 14, 20);
+    doc.setFontSize(12);
+    doc.text("www.smart-shop-kro.netlify.app", 14, 25);
+
+    // Draw a horizontal line to separate header from the rest of the document
+    doc.line(14, 28, 200, 28);
+
+    doc.setFontSize(14);
+    doc.text(`Invoice for Order: ${order._id}`, 14, 40);
 
     // User Info
-    doc.text(`User: ${order.user}`, 14, 30);
+    doc.setFontSize(12);
+    doc.text(`User: ${order.user.name}`, 14, 50);
+    doc.text(`Email: ${order.user.email}`, 14, 55);
 
     // Status and Order Date
-    doc.text(`Status: ${order.status}`, 14, 40);
+    doc.text(`Status: ${order.status}`, 14, 65);
     doc.text(
       `Order Date: ${new Date(order.createdAt).toLocaleString()}`,
       14,
-      50
+      70
     );
 
-    // Create an item table
+    // Draw a horizontal line to separate order info from the address
+    doc.line(14, 75, 200, 75);
+
+    // Address Information
+    const address = order.address;
+    if (address) {
+      doc.setFontSize(12);
+      doc.text("Delivery Address:", 14, 85);
+      doc.text(`${address.name}`, 14, 95);
+      doc.text(`${address.address}`, 14, 100);
+      doc.text(
+        `${address.locality}, ${address.city}, ${address.state} - ${address.pincode}`,
+        14,
+        105
+      );
+      doc.text(`Phone: ${address.phone}`, 14, 110);
+      if (address.landmark) {
+        doc.text(`Landmark: ${address.landmark}`, 14, 115);
+      }
+
+      // Draw a line after the address to separate it from the items table
+      doc.line(14, 120, 200, 120);
+    }
+
+    // Create an item table with improved styling
     const itemRows = order.items.map((item) => [
       item.product.name,
       item.quantity,
@@ -35,27 +79,50 @@ const OrderCard = ({ order }) => {
       `${item.quantity * item.product.price}/-`,
     ]);
 
-    // Auto table for order items
     doc.autoTable({
-      startY: 60, // Start the table below the previous text
+      startY: 125, // Start the table below the address section
       head: [["Product", "Quantity", "Price", "Total"]],
       body: itemRows,
-      theme: "grid", // Option for grid table style
+      theme: "striped",
       headStyles: {
-        fillColor: [41, 128, 185], // Customize header color
-        textColor: [255, 255, 255], // White text for headers
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255],
       },
       styles: {
-        overflow: "linebreak", // Allow content to wrap within cells
-        cellPadding: 3, // Add padding to cells
+        overflow: "linebreak",
+        cellPadding: 5,
+        fontSize: 10,
+      },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        1: { halign: "center" },
+        2: { halign: "right" },
+        3: { halign: "right" },
       },
     });
 
-    // Add Total Amount below the table
-    const finalY = doc.lastAutoTable.finalY; // Get Y position of the last table row
-    doc.text(`Total Amount: ${order.totalAmount}/-`, 14, finalY + 10);
+    // Add subtotal and total amount
+    const finalY = doc.lastAutoTable.finalY;
+    const subtotal = order.items.reduce(
+      (acc, item) => acc + item.product.price * item.quantity,
+      0
+    );
 
-    // Save the PDF
+    const totalAmount = order.totalAmount;
+
+    // Add the ₹ symbol correctly
+    doc.text(`Subtotal: ${subtotal}/-`, 14, finalY + 10); // Using ₹ directly
+    doc.text(`Total Amount: ${totalAmount}/-`, 14, finalY + 20); // Using ₹ directly
+
+    // Add Footer with Terms or Additional Info
+    doc.setFontSize(8);
+    doc.text(
+      "Terms and Conditions: All sales are final. No refunds.",
+      14,
+      doc.internal.pageSize.height - 10
+    );
+
+    // Save the PDF with a custom name
     doc.save(`invoice_${order._id}.pdf`);
   };
 
@@ -71,7 +138,7 @@ const OrderCard = ({ order }) => {
         </div>
 
         <div>
-          <p className="text-gray-800 font-semibold">User ID: {user}</p>
+          <p className="text-gray-800 font-semibold">User ID: {user._id}</p>
           <p className="text-gray-600">
             Status:{" "}
             <span
@@ -122,7 +189,7 @@ const OrderCard = ({ order }) => {
           <div className="bg-white p-8 rounded-lg max-w-lg w-full">
             <h2 className="text-2xl font-bold mb-4">Invoice Preview</h2>
             <p className="text-sm text-gray-500">Order ID: {order._id}</p>
-            <p>User ID: {user}</p>
+            <p>User ID: {user._id}</p>
             <p>Status: {status}</p>
             <p>Order Date: {new Date(createdAt).toLocaleString()}</p>
 
