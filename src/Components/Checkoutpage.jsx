@@ -20,6 +20,8 @@ const CheckoutPage = () => {
   const [addresses, setAddresses] = useState([]);
   const [cartItemsCount, setCartItemsCount] = useState(0);
   const [addressLoading, setAddressLoading] = useState(true);
+  const [newAddressLoading, setNewAddressLoading] = useState(false);
+  const [editAddressLoading, setEditAddressLoading] = useState(false);
 
   const [formValues, setFormValues] = useState({
     name: "",
@@ -196,7 +198,7 @@ const CheckoutPage = () => {
 
   const handleSaveAddress = async () => {
     console.log(formValues);
-
+    setNewAddressLoading(true);
     const addressData = await fetch(`${NODE_API_ENDPOINT}/add-address`, {
       method: "POST",
       headers: {
@@ -207,8 +209,14 @@ const CheckoutPage = () => {
     });
     if (!addressData.ok) {
       toast.error("Error in saving address");
+      setNewAddressLoading(false);
       return;
     }
+    setNewAddressLoading(false);
+
+    const parsedData = await addressData.json();
+    setAddresses((prev) => [...prev, parsedData]);
+    setSelectedAddress(parsedData._id);
     alert("New address added successfully!");
     setEditableAddress(null);
     setAddingNewAddress(false);
@@ -216,6 +224,7 @@ const CheckoutPage = () => {
 
   const handleEditSaveAddress = async () => {
     console.log(formValues);
+    setEditAddressLoading(true);
     const addressData = await fetch(
       `${NODE_API_ENDPOINT}/edit-address/${editableAddress}`,
       {
@@ -228,9 +237,13 @@ const CheckoutPage = () => {
       }
     );
     if (!addressData.ok) {
+      setEditAddressLoading(false);
+
       toast.error("Error in saving address");
       return;
     }
+    setEditAddressLoading(false);
+
     alert("Address updated successfully!");
     setEditableAddress(null);
     setAddingNewAddress(false);
@@ -280,7 +293,7 @@ const CheckoutPage = () => {
           key: process.env.REACT_APP_RAZORPAY_ID,
           //   amount: String(amount),
           currency: currency,
-          name: "CLAW LEGALTECH PRIVATE LIMITED",
+          name: "Smart Solution Pvt. Ltd",
           description: "Transaction",
           order_id: id,
           handler: async function (response) {
@@ -414,20 +427,22 @@ const CheckoutPage = () => {
                           <input
                             type="text"
                             name="name"
+                            required
                             value={formValues.name}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                             placeholder="Name"
                           />
                           <input
                             type="text"
                             name="phone"
+                            required
                             value={formValues.phone}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                             placeholder="Phone"
                             maxLength={10}
-                            pattern="^[6-9]\d{9}$" // Indian phone number pattern
+                            pattern="^[6-9]\d{9}$"
                             title="Phone number should be a valid Indian phone number starting with 6-9 and followed by 9 digits."
                           />
                           <input
@@ -435,33 +450,36 @@ const CheckoutPage = () => {
                             name="pincode"
                             value={formValues.pincode}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
-                            pattern="^[1-9][0-9]{5}$" // Indian pincode pattern
+                            className="border p-2 rounded w-full text-sm sm:text-base"
+                            pattern="^[1-9][0-9]{5}$"
                             required
-                            placeholder="pincode"
+                            placeholder="Pincode"
                             title="Pincode should be a valid 6-digit Indian postal code."
                           />
                           <input
                             type="text"
                             name="locality"
+                            required
                             value={formValues.locality}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                             placeholder="Locality"
                           />
                           <textarea
                             name="address"
                             value={formValues.address}
+                            required
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full col-span-2"
+                            className="border p-2 rounded w-full col-span-1 sm:col-span-2 text-sm sm:text-base"
                             placeholder="Address (Area and street)"
                           />
                           <input
                             type="text"
                             name="city"
+                            required
                             value={formValues.city}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                             placeholder="City/District/Town"
                           />
                           <input
@@ -469,14 +487,15 @@ const CheckoutPage = () => {
                             name="landmark"
                             value={formValues.landmark}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                             placeholder="Landmark (Optional)"
                           />
                           <select
                             name="state"
+                            required
                             value={formValues.state}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                           >
                             <option value="">Select State</option>
                             {states.map((state, index) => (
@@ -487,24 +506,42 @@ const CheckoutPage = () => {
                           </select>
                           <select
                             name="type"
+                            required
                             value={formValues.type}
                             onChange={handleInputChange}
-                            className="border p-2 rounded w-full"
+                            className="border p-2 rounded w-full text-sm sm:text-base"
                           >
                             <option value="HOME">Home</option>
                             <option value="WORK">Work</option>
                           </select>
                         </div>
-                        <div className="mt-4 flex gap-4 justify-between">
+                        <div className="mt-4 flex flex-col sm:flex-row gap-4 justify-between">
                           <button
                             onClick={handleEditSaveAddress}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                            className=" grid place-items-center w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm sm:text-base"
                           >
-                            Save and Deliver Here
+                            {editAddressLoading ? (
+                              <ColorRing
+                                visible={true}
+                                height="30"
+                                width="30"
+                                ariaLabel="color-ring-loading"
+                                wrapperClass="flex justify-center"
+                                colors={[
+                                  "#ffffff",
+                                  "#ffffff",
+                                  "#ffffff",
+                                  "#ffffff",
+                                  "#ffffff",
+                                ]}
+                              />
+                            ) : (
+                              "Save and Deliver Here"
+                            )}
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                            className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 text-sm sm:text-base"
                           >
                             Cancel
                           </button>
@@ -522,58 +559,61 @@ const CheckoutPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     type="text"
+                    required
                     name="name"
                     value={formValues.name}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                     placeholder="Name"
                     title="Provide valid name"
                   />
                   <input
                     type="text"
+                    required
                     name="phone"
                     value={formValues.phone}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                     placeholder="Phone"
-                    required
-                    max={10}
-                    pattern="^[6-9]\d{9}$" // Indian phone number pattern
+                    maxLength={10}
+                    pattern="^[6-9]\d{9}$"
                     title="Phone number should be a valid Indian phone number starting with 6-9 and followed by 9 digits."
                   />
                   <input
                     type="text"
+                    required
                     name="pincode"
                     value={formValues.pincode}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
-                    pattern="^[1-9][0-9]{5}$" // Indian pincode pattern
-                    required
-                    placeholder="pincode"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
+                    pattern="^[1-9][0-9]{5}$"
+                    placeholder="Pincode"
                     title="Pincode should be a valid 6-digit Indian postal code."
                   />
                   <input
                     type="text"
                     name="locality"
+                    required
                     value={formValues.locality}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                     placeholder="Locality"
-                    title=""
                   />
                   <textarea
                     name="address"
+                    required
                     value={formValues.address}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full col-span-2"
+                    className="border p-2 rounded w-full col-span-1 sm:col-span-2 text-sm sm:text-base"
                     placeholder="Address (Area and street)"
                   />
                   <input
                     type="text"
                     name="city"
+                    required
                     value={formValues.city}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                     placeholder="City/District/Town"
                   />
                   <input
@@ -581,14 +621,15 @@ const CheckoutPage = () => {
                     name="landmark"
                     value={formValues.landmark}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                     placeholder="Landmark (Optional)"
                   />
                   <select
                     name="state"
+                    required
                     value={formValues.state}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                   >
                     <option value="">Select State</option>
                     {states.map((state, index) => (
@@ -599,24 +640,42 @@ const CheckoutPage = () => {
                   </select>
                   <select
                     name="type"
+                    required
                     value={formValues.type}
                     onChange={handleInputChange}
-                    className="border p-2 rounded w-full"
+                    className="border p-2 rounded w-full text-sm sm:text-base"
                   >
                     <option value="HOME">Home</option>
                     <option value="WORK">Work</option>
                   </select>
                 </div>
-                <div className="mt-4 flex gap-4 justify-between">
+                <div className="mt-4 flex flex-col sm:flex-row gap-4 justify-between">
                   <button
                     onClick={handleSaveAddress}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    className=" grid place-items-center w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm sm:text-base"
                   >
-                    Save New Address
+                    {newAddressLoading ? (
+                      <ColorRing
+                        visible={true}
+                        height="30"
+                        width="30"
+                        ariaLabel="color-ring-loading"
+                        wrapperClass="flex justify-center"
+                        colors={[
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ]}
+                      />
+                    ) : (
+                      "Save New Address"
+                    )}
                   </button>
                   <button
                     onClick={handleCancelEdit}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    className="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 text-sm sm:text-base"
                   >
                     Cancel
                   </button>
@@ -660,7 +719,7 @@ const CheckoutPage = () => {
           <button
             onClick={loadRazorpay}
             type="submit"
-            className="bg-green-500 text-white py-2 px-4 text-lg rounded hover:bg-green-600 w-full sm:w-auto"
+            className="bg-green-500 text-white py-2 px-4 text-lg rounded hover:bg-green-600 w-full sm:w-auto grid place-items-center"
           >
             {loading ? (
               <ColorRing
