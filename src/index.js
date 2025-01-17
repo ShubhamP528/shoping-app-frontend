@@ -36,6 +36,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google"; // Import the provide
 import Profile from "./Components/Profile";
 import EditProfile from "./Components/EditProfile";
 import CheckoutPage from "./Components/Checkoutpage";
+import HomePage from "./Components/DummyHome";
 
 // Define your router configuration
 const appRouter = createBrowserRouter([
@@ -144,6 +145,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/checkout",
         element: <CheckoutPage />,
+      },
+      {
+        path: "/dummy",
+        element: <HomePage />,
       },
     ],
   },
