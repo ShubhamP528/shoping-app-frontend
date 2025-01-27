@@ -336,6 +336,18 @@ const ProductDetailPage = () => {
       setComments([...reviews.slice(0, reviews.length - 1)]);
       setUserHasReviewed(false); // Revert the state if adding comment fails
     }
+    const respo = await commentAdded.json();
+    const newReview1 = {
+      _id: respo.reviewId,
+      rating: newRating,
+      comment: newComment,
+      productId: product._id,
+      user: {
+        name: currentUser.name,
+      },
+    };
+    setReviews([...reviews, newReview1]);
+    setComments([...reviews, newReview1]);
   };
 
   const handleEditReview = (review) => {
